@@ -1,8 +1,27 @@
-# Getting Started with Create React App
+# Travel Dashboard Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern React-based frontend for the Travel Dashboard application, built with TypeScript and Tailwind CSS.
 
-## Available Scripts
+## 🚀 Features
+
+- **User Authentication**: Secure login and registration
+- **Experience Management**: Browse, search and filter travel experiences
+- **Image Gallery**: View and manage travel photos
+- **Itinerary Planning**: Create and manage travel itineraries
+- **Updates Feed**: Stay updated with the latest travel information
+- **Admin Dashboard**: Comprehensive management tools for administrators
+
+## 🔧 Tech Stack
+
+- **React**: Frontend library
+- **TypeScript**: Type-safe JavaScript
+- **Tailwind CSS**: Utility-first CSS framework
+- **Shadcn/UI**: Modern UI component library
+- **Axios**: HTTP client for API requests
+
+## 🛠️ Local Development
+
+### Available Scripts
 
 In the project directory, you can run:
 
@@ -11,55 +30,96 @@ In the project directory, you can run:
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Launches the test runner in the interactive watch mode.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Builds the app for production to the `build` folder.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🌐 Deployment
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Option 1: Vercel (Recommended)
 
-### `npm run eject`
+#### Using the Deployment Script
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Install Vercel CLI:
+   ```bash
+   npm install -g vercel
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Login to Vercel:
+   ```bash
+   vercel login
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Run the deployment script:
+   - **Windows**: 
+     ```powershell
+     .\deploy.ps1
+     ```
+   - **Mac/Linux**: 
+     ```bash
+     chmod +x ./deploy.sh
+     ./deploy.sh
+     ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### Manual Deployment
 
-## Learn More
+1. Build the application:
+   ```bash
+   npm run build
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. Deploy using Vercel CLI:
+   ```bash
+   vercel --prod
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Configure environment variables in the Vercel dashboard:
+   - `REACT_APP_API_URL`: Your Railway backend URL
 
-### Code Splitting
+### Option 2: Railway
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+You can also deploy the frontend to Railway alongside your backend:
 
-### Analyzing the Bundle Size
+1. Add a new service to your Railway project:
+   ```bash
+   railway add
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+2. Link your frontend directory:
+   ```bash
+   cd frontend
+   railway link
+   ```
 
-### Making a Progressive Web App
+3. Set environment variables:
+   ```bash
+   railway variables set REACT_APP_API_URL=$RAILWAY_SERVICE_API_URL
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+4. Deploy:
+   ```bash
+   railway up
+   ```
 
-### Advanced Configuration
+## 🔗 Connecting Frontend to Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Production Setup
+
+Ensure your frontend is configured to connect to the deployed backend:
+
+1. In the Vercel dashboard, set environment variable:
+   ```
+   REACT_APP_API_URL=https://your-railway-app.up.railway.app
+   ```
+
+2. For Railway frontend deployment, use:
+   ```
+   REACT_APP_API_URL=https://your-railway-app.up.railway.app
+   ```
 
 ### Deployment
 
