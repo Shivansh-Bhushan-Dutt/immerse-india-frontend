@@ -45,18 +45,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     }
   };
 
-  const fillAdminCredentials = () => {
-    setEmail('admin@dashboard.com');
-    setPassword('admin123');
-    setError('');
-  };
-
-  const fillUserCredentials = () => {
-    setEmail('user@dashboard.com');
-    setPassword('user123');
-    setError('');
-  };
-
   return (
     <div 
       className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
@@ -86,7 +74,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   autoComplete="email"
@@ -127,36 +115,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 )}
               </Button>
             </form>
-
-            <div className="mt-6 pt-6 border-t">
-              <p className="text-sm text-slate-600 mb-3">Demo Accounts:</p>
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={fillAdminCredentials}
-                  className="w-full justify-start"
-                >
-                  <span className="mr-2">👑</span>
-                  <div className="text-left">
-                    <div>Admin Account</div>
-                    <div className="text-xs text-slate-500">admin@immersivetours.com</div>
-                  </div>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={fillUserCredentials}
-                  className="w-full justify-start"
-                >
-                  <span className="mr-2">👤</span>
-                  <div className="text-left">
-                    <div>User Account</div>
-                    <div className="text-xs text-slate-500">user@example.com</div>
-                  </div>
-                </Button>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
