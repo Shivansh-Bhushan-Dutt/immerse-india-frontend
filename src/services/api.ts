@@ -79,26 +79,30 @@ export const experiencesAPI = {
     return handleResponse(response);
   },
 
-  create: async (formData: FormData) => {
+  create: async (data: FormData | any) => {
     const token = localStorage.getItem('authToken');
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_BASE_URL}/experiences`, {
       method: 'POST',
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` })
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isFormData && { 'Content-Type': 'application/json' })
       },
-      body: formData // Don't set Content-Type for FormData
+      body: isFormData ? data : JSON.stringify(data)
     });
     return handleResponse(response);
   },
 
-  update: async (id: string, formData: FormData) => {
+  update: async (id: string, data: FormData | any) => {
     const token = localStorage.getItem('authToken');
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_BASE_URL}/experiences/${id}`, {
       method: 'PUT',
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` })
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isFormData && { 'Content-Type': 'application/json' })
       },
-      body: formData
+      body: isFormData ? data : JSON.stringify(data)
     });
     return handleResponse(response);
   },
@@ -124,26 +128,30 @@ export const itinerariesAPI = {
     return handleResponse(response);
   },
 
-  create: async (formData: FormData) => {
+  create: async (data: FormData | any) => {
     const token = localStorage.getItem('authToken');
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_BASE_URL}/itineraries`, {
       method: 'POST',
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` })
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isFormData && { 'Content-Type': 'application/json' })
       },
-      body: formData
+      body: isFormData ? data : JSON.stringify(data)
     });
     return handleResponse(response);
   },
 
-  update: async (id: string, formData: FormData) => {
+  update: async (id: string, data: FormData | any) => {
     const token = localStorage.getItem('authToken');
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_BASE_URL}/itineraries/${id}`, {
       method: 'PUT',
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` })
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isFormData && { 'Content-Type': 'application/json' })
       },
-      body: formData
+      body: isFormData ? data : JSON.stringify(data)
     });
     return handleResponse(response);
   },

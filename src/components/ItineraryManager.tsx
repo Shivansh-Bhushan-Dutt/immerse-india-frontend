@@ -177,31 +177,11 @@ export function ItineraryManager({ data, onUpdateData }: ItineraryManagerProps) 
 
       if (editingItinerary) {
         // Update existing
-        await itinerariesAPI.update(editingItinerary.id, new FormData());
-        // For now, use fetch directly since FormData is complex
-        const response = await fetch(`http://localhost:5000/api/itineraries/${editingItinerary.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify(itineraryData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to update');
+        await itinerariesAPI.update(editingItinerary.id, itineraryData);
         toast.success('Itinerary updated successfully');
       } else {
         // Add new
-        const response = await fetch(`http://localhost:5000/api/itineraries`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify(itineraryData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to create');
+        await itinerariesAPI.create(itineraryData);
         toast.success('Itinerary added successfully');
       }
 

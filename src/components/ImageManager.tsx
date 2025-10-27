@@ -153,7 +153,7 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
       };
 
       // Use direct fetch for images since the API expects JSON
-      const response = await fetch('http://localhost:5000/api/images', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/images`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

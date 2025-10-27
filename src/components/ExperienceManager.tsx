@@ -156,33 +156,11 @@ export function ExperienceManager({ data, onUpdateData }: ExperienceManagerProps
 
       if (editingExperience) {
         // Update existing
-        await experiencesAPI.update(editingExperience.id, new FormData());
-        // For now, create FormData manually since we're not handling file uploads yet
-        const response = await fetch(`http://localhost:5000/api/experiences/${editingExperience.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify(experienceData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to update');
-        
+        await experiencesAPI.update(editingExperience.id, experienceData);
         toast.success('Experience updated successfully');
       } else {
         // Add new
-        const response = await fetch(`http://localhost:5000/api/experiences`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify(experienceData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to create');
-        
+        await experiencesAPI.create(experienceData);
         toast.success('Experience added successfully');
       }
 
