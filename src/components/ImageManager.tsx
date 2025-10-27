@@ -146,35 +146,53 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
     setUploadProgress(0);
 
     try {
-      // For now, since the backend expects JSON, create the image data directly
-      const newImage = {
-        destination: imageData.destination,
-        region: imageData.region,
-        caption: imageData.caption,
-        url: imageData.url || '' // Use URL since file upload needs special handling
-      };
+      // Create FormData for file upload to Cloudinary
+      const formData = new FormData();
+      formData.append('destination', imageData.destination);
+      formData.append('region', imageData.region);
+      formData.append('caption', imageData.caption);
+      
+      // If user uploaded a file, send it to Cloudinary via backend
+      if (imageData.file) {
+        formData.append('image', imageData.file);
+      } else if (imageData.url) {
+        // If user provided a URL, just send the URL
+        formData.append('url', imageData.url);
+      } else {
+        throw new Error('Please provide an image file or URL');
+      }
 
-      // Use direct fetch for images since the API expects JSON
+      // Upload to backend (which will upload to Cloudinary if file is provided)
       const response = await fetch(`${process.env.REACT_APP_API_URL}/images`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          // Don't set Content-Type for FormData - browser will set it with boundary
         },
-        body: JSON.stringify(newImage)
+        body: formData
       });
 
-      if (!response.ok) throw new Error('Failed to create image');
-      const createdImage = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(errorData.error || 'Failed to upload image');
+      }
+      
+      const result = await response.json();
+      const createdImage = result.data;
 
       setImages([...images, createdImage]);
       onUpdateData({
         ...data,
         images: [...images, createdImage]
       });
-      toast.success('Image uploaded successfully!');
+      
+      if (imageData.file) {
+        toast.success('Image uploaded to Cloudinary successfully!');
+      } else {
+        toast.success('Image added successfully!');
+      }
     } catch (error) {
-      toast.error('Failed to upload image');
+      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
       console.error('Error uploading image:', error);
     } finally {
       setIsLoading(false);
@@ -182,40 +200,63 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.url) {
+    // Validate that we have either a file or URL
+    if (!uploadedFile && !formData.url) {
       toast.error('Please provide an image URL or upload an image');
       return;
     }
 
     if (editingImage) {
-      const updated: DestinationImage = {
-        ...editingImage,
-        destination: formData.destination,
-        region: formData.region,
-        url: formData.url,
-        caption: formData.caption
-      };
-      const newImages = images.map(img =>
-        img.id === editingImage.id ? updated : img
-      );
-      setImages(newImages);
-      onUpdateData({ ...data, images: newImages });
-      toast.success('Image updated successfully');
+      // Handle update
+      try {
+        setIsLoading(true);
+        const formDataToSend = new FormData();
+        formDataToSend.append('destination', formData.destination);
+        formDataToSend.append('region', formData.region);
+        formDataToSend.append('caption', formData.caption);
+        
+        if (uploadedFile) {
+          formDataToSend.append('image', uploadedFile);
+        } else if (formData.url) {
+          formDataToSend.append('url', formData.url);
+        }
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/images/${editingImage.id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: formDataToSend
+        });
+
+        if (!response.ok) throw new Error('Failed to update');
+        const result = await response.json();
+        const updatedImage = result.data;
+
+        const newImages = images.map(img =>
+          img.id === editingImage.id ? updatedImage : img
+        );
+        setImages(newImages);
+        onUpdateData({ ...data, images: newImages });
+        toast.success('Image updated successfully');
+      } catch (error) {
+        toast.error('Failed to update image');
+        console.error('Update error:', error);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
-      const newImage: DestinationImage = {
-        id: Date.now().toString(),
+      // Handle create - use handleUploadImage
+      await handleUploadImage({
         destination: formData.destination,
         region: formData.region,
-        url: formData.url,
         caption: formData.caption,
-        createdAt: Date.now()
-      };
-      setImages([...images, newImage]);
-      onUpdateData({ ...data, images: [...images, newImage] });
-      toast.success('Image added successfully');
+        url: formData.url,
+        file: uploadedFile || undefined
+      });
     }
 
     setIsDialogOpen(false);
