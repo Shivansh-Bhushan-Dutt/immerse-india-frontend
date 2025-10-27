@@ -127,6 +127,18 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
     try {
       const response = await imagesAPI.getAll();
       const imageData = response.data || response || [];
+      
+      // Debug: Log fetched images
+      console.log('📥 Fetched images:', imageData);
+      imageData.forEach((img: any, index: number) => {
+        console.log(`Image ${index + 1}:`, {
+          id: img.id,
+          destination: img.destination,
+          url: img.url,
+          urlValid: img.url && img.url.length > 0
+        });
+      });
+      
       setImages(imageData);
       onUpdateData({
         ...data,
@@ -179,6 +191,17 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
       
       const result = await response.json();
       const createdImage = result.data;
+
+      // Debug: Log the created image data
+      console.log('✅ Image created:', createdImage);
+      console.log('📸 Image URL:', createdImage.url);
+      console.log('☁️ Cloudinary upload:', result.cloudinary);
+
+      // Validate image URL
+      if (!createdImage.url || createdImage.url === '') {
+        console.error('❌ Warning: Image URL is empty!', createdImage);
+        toast.error('Image created but URL is missing. Check console for details.');
+      }
 
       setImages([...images, createdImage]);
       onUpdateData({
