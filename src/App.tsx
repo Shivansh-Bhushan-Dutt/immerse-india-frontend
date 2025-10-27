@@ -92,22 +92,29 @@ function App() {
   const fetchAllData = async () => {
     setIsLoading(true);
     try {
-      const [experiences, itineraries, images, updates] = await Promise.all([
-        experiencesAPI.getAll().then(res => res.data),
-        itinerariesAPI.getAll().then(res => res.data),
-        imagesAPI.getAll().then(res => res.data),
-        updatesAPI.getAll().then(res => res.data)
+      const [experiencesRes, itinerariesRes, imagesRes, updatesRes] = await Promise.all([
+        experiencesAPI.getAll(),
+        itinerariesAPI.getAll(),
+        imagesAPI.getAll(),
+        updatesAPI.getAll()
       ]);
       
       setData({
-        experiences,
-        itineraries,
-        images,
-        updates
+        experiences: experiencesRes.data || [],
+        itineraries: itinerariesRes.data || [],
+        images: imagesRes.data || [],
+        updates: updatesRes.data || []
       });
     } catch (error) {
       toast.error('Failed to load dashboard data');
       console.error('Error loading data:', error);
+      // Set empty arrays on error to prevent crashes
+      setData({
+        experiences: [],
+        itineraries: [],
+        images: [],
+        updates: []
+      });
     } finally {
       setIsLoading(false);
     }
@@ -141,6 +148,17 @@ function App() {
 
   if (!user) {
     return <LoginPage onLogin={handleLogin} />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-600 mx-auto mb-4"></div>
+          <p className="text-slate-700 text-lg font-medium">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   if (user.role === 'admin') {

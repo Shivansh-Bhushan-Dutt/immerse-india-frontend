@@ -126,14 +126,16 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
     setIsLoading(true);
     try {
       const response = await imagesAPI.getAll();
-      setImages(response);
+      const imageData = response.data || response || [];
+      setImages(imageData);
       onUpdateData({
         ...data,
-        images: response
+        images: imageData
       });
     } catch (error) {
       toast.error('Failed to load images');
       console.error('Error fetching images:', error);
+      setImages([]);
     } finally {
       setIsLoading(false);
     }
@@ -222,7 +224,16 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      {isLoading && images.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto mb-4"></div>
+            <p className="text-slate-600">Loading images...</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-slate-900 font-semibold text-xl">Destination Images</h2>
           <p className="text-slate-600">Manage photos and media for destinations</p>
@@ -403,12 +414,14 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
         ))}
       </div>
 
-      {images.length === 0 && (
+      {images.length === 0 && !isLoading && (
         <Card>
           <CardContent className="text-center py-12">
             <p className="text-slate-500">No images yet. Add your first one!</p>
           </CardContent>
         </Card>
+      )}
+        </>
       )}
     </div>
   );

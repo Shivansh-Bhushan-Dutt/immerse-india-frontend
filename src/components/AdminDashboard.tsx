@@ -35,14 +35,14 @@ export function AdminDashboard({ user, data, onLogout, onUpdateData }: AdminDash
 
   const filteredData = {
     experiences: selectedRegion === 'All' 
-      ? data.experiences 
-      : data.experiences.filter(exp => exp.region === selectedRegion),
+      ? (data.experiences || [])
+      : (data.experiences || []).filter(exp => exp.region === selectedRegion),
     itineraries: selectedRegion === 'All' 
-      ? data.itineraries 
-      : data.itineraries.filter(it => it.region === selectedRegion),
+      ? (data.itineraries || [])
+      : (data.itineraries || []).filter(it => it.region === selectedRegion),
     images: selectedRegion === 'All' 
-      ? data.images 
-      : data.images.filter(img => img.region === selectedRegion)
+      ? (data.images || [])
+      : (data.images || []).filter(img => img.region === selectedRegion)
   };
 
   return (
@@ -103,7 +103,9 @@ export function AdminDashboard({ user, data, onLogout, onUpdateData }: AdminDash
                     </div>
                     <div className="flex flex-col justify-center">
                       <CardTitle className="leading-tight font-semibold text-lg">Experiences</CardTitle>
-                      <CardDescription className="text-base">{filteredData.experiences.length} items</CardDescription>
+                      <CardDescription className="text-base">
+                        {filteredData.experiences?.length || 0} items
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -120,7 +122,9 @@ export function AdminDashboard({ user, data, onLogout, onUpdateData }: AdminDash
                     </div>
                     <div className="flex flex-col justify-center">
                       <CardTitle className="leading-tight font-semibold text-lg">Itineraries</CardTitle>
-                      <CardDescription className="text-base">{filteredData.itineraries.length} items</CardDescription>
+                      <CardDescription className="text-base">
+                        {filteredData.itineraries?.length || 0} items
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -137,7 +141,9 @@ export function AdminDashboard({ user, data, onLogout, onUpdateData }: AdminDash
                     </div>
                     <div className="flex flex-col justify-center">
                       <CardTitle className="leading-tight font-semibold text-lg">Images</CardTitle>
-                      <CardDescription className="text-base">{filteredData.images.length} items</CardDescription>
+                      <CardDescription className="text-base">
+                        {filteredData.images?.length || 0} items
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
