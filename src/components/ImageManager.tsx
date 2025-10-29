@@ -127,18 +127,6 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
     try {
       const response = await imagesAPI.getAll();
       const imageData = response.data || response || [];
-      
-      // Debug: Log fetched images
-      console.log('📥 Fetched images:', imageData);
-      imageData.forEach((img: any, index: number) => {
-        console.log(`Image ${index + 1}:`, {
-          id: img.id,
-          destination: img.destination,
-          url: img.url,
-          urlValid: img.url && img.url.length > 0
-        });
-      });
-      
       setImages(imageData);
       onUpdateData({
         ...data,
@@ -167,9 +155,11 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
       // If user uploaded a file, send it to Cloudinary via backend
       if (imageData.file) {
         formData.append('image', imageData.file);
+        console.log('Uploading file to Cloudinary:', imageData.file.name);
       } else if (imageData.url) {
         // If user provided a URL, just send the URL
         formData.append('url', imageData.url);
+        console.log('Adding image from URL:', imageData.url);
       } else {
         throw new Error('Please provide an image file or URL');
       }
@@ -190,30 +180,30 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
       }
       
       const result = await response.json();
-      const createdImage = result.data;
-
-      // Debug: Log the created image data
-      console.log('✅ Image created:', createdImage);
-      console.log('📸 Image URL:', createdImage.url);
-      console.log('☁️ Cloudinary upload:', result.cloudinary);
-
-      // Validate image URL
-      if (!createdImage.url || createdImage.url === '') {
-        console.error('❌ Warning: Image URL is empty!', createdImage);
-        toast.error('Image created but URL is missing. Check console for details.');
+      console.log('Upload response:', result);
+      
+      if (!result.success || !result.data) {
+        throw new Error('Invalid response from server');
       }
 
-      setImages([...images, createdImage]);
-      onUpdateData({
-        ...data,
-        images: [...images, createdImage]
-      });
+      const createdImage = result.data;
+
+      // Validate that we got a proper URL
+      if (!createdImage.url) {
+        throw new Error('No image URL received from server');
+      }
+
+      console.log('Image created with URL:', createdImage.url);
       
       if (imageData.file) {
         toast.success('Image uploaded to Cloudinary successfully!');
       } else {
         toast.success('Image added successfully!');
       }
+
+      // Refresh images from backend to ensure sync
+      await fetchImages();
+      
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to upload image');
       console.error('Error uploading image:', error);
@@ -243,8 +233,10 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
         
         if (uploadedFile) {
           formDataToSend.append('image', uploadedFile);
+          console.log('Updating with new file:', uploadedFile.name);
         } else if (formData.url) {
           formDataToSend.append('url', formData.url);
+          console.log('Updating with URL:', formData.url);
         }
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/images/${editingImage.id}`, {
@@ -255,18 +247,25 @@ export function ImageManager({ data, onUpdateData }: ImageManagerProps) {
           body: formDataToSend
         });
 
-        if (!response.ok) throw new Error('Failed to update');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Update failed' }));
+          throw new Error(errorData.error || 'Failed to update');
+        }
+        
         const result = await response.json();
-        const updatedImage = result.data;
+        console.log('Update response:', result);
+        
+        if (!result.success || !result.data) {
+          throw new Error('Invalid response from server');
+        }
 
-        const newImages = images.map(img =>
-          img.id === editingImage.id ? updatedImage : img
-        );
-        setImages(newImages);
-        onUpdateData({ ...data, images: newImages });
         toast.success('Image updated successfully');
+        
+        // Refresh images from backend
+        await fetchImages();
+        
       } catch (error) {
-        toast.error('Failed to update image');
+        toast.error(error instanceof Error ? error.message : 'Failed to update image');
         console.error('Update error:', error);
       } finally {
         setIsLoading(false);
